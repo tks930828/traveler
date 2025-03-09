@@ -14,7 +14,7 @@ def index
 end
 
 def show
-  @post =Post.find(params[:id])
+  @post = Post.find(params[:id])
   @comment = Comment.new
   @comments = @post.comments.page(params[:page]).per(7).reverse_order
 end
