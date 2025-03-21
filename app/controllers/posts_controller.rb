@@ -3,15 +3,23 @@ class PostsController < ApplicationController
     @post = Post.new
   end
 
+  def confirm
+    @posts = current_user.posts.draft.page(params[:page]).reverse_order
+  end 
+
   def create
-    post = Post.new(post_params)
-    post.user_id = current_user.id
-    post.save
-    redirect_to post_path(post.id)
+    @post = Post.new(post_params)
+    @post.user_id = current_user.id
+    if @post.save
+      redirect_to post_path(@post.id)
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
 def index
-  @posts = Post.page(params[:page]).reverse_order
+  @posts = Post.published.page(params[:page]).reverse_order
+  @posts = @posts.where('location LIKE ?', "%#{params[:search]}%") if params[:search].present?
 end
 
 def show
@@ -25,9 +33,12 @@ def edit
 end
 
 def update
-  post = Post.find(params[:id])
-  post.update(post_params)
-  redirect_to post_path(post.id)
+  @post = Post.find(params[:id])
+  if @post.update(post_params)
+    redirect_to post_path(@post.id)
+  else
+    render :edit, status: :unprecessable_entity
+  end
 end
 
 def destroy
@@ -38,6 +49,6 @@ end
 
   private
   def post_params
-    params.require(:post).permit(:user_id, :location, :text, :image)
+    params.require(:post).permit(:user_id, :location, :text, :image, :status)
   end
 end
