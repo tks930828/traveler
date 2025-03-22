@@ -78,3 +78,4 @@ gem 'jquery-rails'
 gem "sassc-rails"
 gem "devise"
 gem "kaminari"
+gem 'devise-i18n'
